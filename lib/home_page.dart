@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:gps/gps.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_form_builder/flutter_form_builder.dart';
 // import 'package:form_builder_validators/form_builder_validators.dart';
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> initSocket() async {
     try {
-      socket = IO.io("http://10.12.42.196:3700", <String, dynamic>{
+      socket = IO.io("http://10.12.23.127:3700", <String, dynamic>{
         'transports': ['websocket'],
         'autoConnect': true,
       });
@@ -52,43 +52,49 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        FormHelper.inputFieldWidget(
-                          context,
-                          "Latitude",
-                          "Latitude",
-                          (onvalidate) {
-                            if (onvalidate.isEmpty) {
-                              return '* Required';
-                            }
-                            return null;
-                          },
-                          (onSaved) {
-                            latitude = double.parse(onSaved!);
-                          },
-                          borderRadius: 10,
-                        ),
+                        // FormHelper.inputFieldWidget(
+                        //   context,
+                        //   "Latitude",
+                        //   "Latitude",
+                        //   (onvalidate) {
+                        //     if (onvalidate.isEmpty) {
+                        //       return '* Required';
+                        //     }
+                        //     return null;
+                        //   },
+                        //   (onSaved) {
+                        //     latitude = double.parse(onSaved!);
+                        //   },
+                        //   borderRadius: 10,
+                        // ),
+                        // const SizedBox(
+                        //   height: 10,
+                        // ),
+                        // FormHelper.inputFieldWidget(
+                        //   context,
+                        //   "Longitude",
+                        //   "Longitude",
+                        //   (onvalidate) {
+                        //     if (onvalidate.isEmpty) {
+                        //       return '* Required';
+                        //     }
+                        //     return null;
+                        //   },
+                        //   (onSaved) {
+                        //     longitude = double.parse(onSaved!);
+                        //   },
+                        //   borderRadius: 10,
+                        // ),
                         const SizedBox(
                           height: 10,
                         ),
-                        FormHelper.inputFieldWidget(
-                          context,
-                          "Longitude",
-                          "Longitude",
-                          (onvalidate) {
-                            if (onvalidate.isEmpty) {
-                              return '* Required';
-                            }
-                            return null;
-                          },
-                          (onSaved) {
-                            longitude = double.parse(onSaved!);
-                          },
-                          borderRadius: 10,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        FormHelper.submitButton("Send Location", () {
+                        FormHelper.submitButton("Send Location", () async {
+                          var latlng = await Gps.currentGps();
+                          print(latlng.lat);
+                          print(latlng.lng);
+                          latitude = double.parse(latlng.lat);
+                          longitude = double.parse(latlng.lng);
+                      
                           if (validateAndSave()) {
                             var coords = {"lat": latitude, "lng": longitude};
                             socket.emit("position-change", jsonEncode(coords));
@@ -98,7 +104,6 @@ class _HomePageState extends State<HomePage> {
                     )))));
   }
 
-  @override
   void disconnect() {
     super.dispose();
   }
