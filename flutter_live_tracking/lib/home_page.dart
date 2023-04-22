@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:gps/gps.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+
 // import 'package:flutter_form_builder/flutter_form_builder.dart';
 // import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -52,49 +53,16 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        // FormHelper.inputFieldWidget(
-                        //   context,
-                        //   "Latitude",
-                        //   "Latitude",
-                        //   (onvalidate) {
-                        //     if (onvalidate.isEmpty) {
-                        //       return '* Required';
-                        //     }
-                        //     return null;
-                        //   },
-                        //   (onSaved) {
-                        //     latitude = double.parse(onSaved!);
-                        //   },
-                        //   borderRadius: 10,
-                        // ),
-                        // const SizedBox(
-                        //   height: 10,
-                        // ),
-                        // FormHelper.inputFieldWidget(
-                        //   context,
-                        //   "Longitude",
-                        //   "Longitude",
-                        //   (onvalidate) {
-                        //     if (onvalidate.isEmpty) {
-                        //       return '* Required';
-                        //     }
-                        //     return null;
-                        //   },
-                        //   (onSaved) {
-                        //     longitude = double.parse(onSaved!);
-                        //   },
-                        //   borderRadius: 10,
-                        // ),
                         const SizedBox(
                           height: 10,
                         ),
                         FormHelper.submitButton("Send Location", () async {
-                          var latlng = await Gps.currentGps();
-                          print(latlng.lat);
-                          print(latlng.lng);
-                          latitude = double.parse(latlng.lat);
-                          longitude = double.parse(latlng.lng);
-                      
+                          Position latlng = await Geolocator.getCurrentPosition(
+                              desiredAccuracy: LocationAccuracy.high);
+                          print(latlng.latitude);
+                          print(latlng.longitude);
+                          latitude = latlng.latitude;
+                          longitude = latlng.longitude;
                           if (validateAndSave()) {
                             var coords = {"lat": latitude, "lng": longitude};
                             socket.emit("position-change", jsonEncode(coords));

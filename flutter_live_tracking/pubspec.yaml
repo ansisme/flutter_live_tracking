@@ -40,7 +40,7 @@ dependencies:
   flutter_form_builder: ^7.7.0
   form_builder_validators: ^8.5.0
   snippet_coder_utils: ^1.0.13
-  gps: ^0.1.1
+  geolocator: ^9.0.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
